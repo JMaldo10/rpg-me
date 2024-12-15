@@ -3,6 +3,7 @@ import babel from '@rollup/plugin-babel';
 import { rollupPluginHTML as html } from '@web/rollup-plugin-html';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 import esbuild from 'rollup-plugin-esbuild';
+import copy from 'rollup-plugin-copy';
 
 export default {
   input: 'index.html',
@@ -26,6 +27,18 @@ export default {
     esbuild({
       minify: true,
       target: ['chrome64', 'firefox67', 'safari11.1'],
+    }), 
+    copy({
+      targets: [
+        {
+          src: 'node_modules/@haxtheweb/simple-icon/lib/svgs',
+          dest: 'public',
+        },
+        {
+          src: 'node_modules/@haxtheweb/hax-iconset/lib/svgs',
+          dest: 'public',
+        },
+      ],
     }),
     /** Bundle assets references via import.meta.url */
     importMetaAssets(),
