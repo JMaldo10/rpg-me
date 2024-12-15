@@ -1,12 +1,12 @@
-import { LitElement, html, css } from "lit";
-import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
-import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
-import "@haxtheweb/rpg-character/rpg-character.js";
-
+import { LitElement, html, css } from 'lit';
+import { DDDSuper } from '@haxtheweb/d-d-d/d-d-d.js';
+import { I18NMixin } from '@haxtheweb/i18n-manager/lib/I18NMixin.js';
+import '@haxtheweb/rpg-character/rpg-character.js';
+import 'wired-elements';
 
 export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   static get tag() {
-    return "rpg-me";
+    return 'rpg-me';
   }
 
   constructor() {
@@ -48,7 +48,6 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
     };
   }
 
-  // Keeping your existing styles unchanged
   static get styles() {
     return [
       super.styles,
@@ -56,33 +55,27 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
         :host {
           display: block;
           font-family: var(--ddd-font-primary);
+          margin: 0;
         }
 
         .wrapper {
-          display: inline-flex;
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--ddd-spacing-4);
         }
 
         .character-panel {
           background: var(--ddd-theme-default-slateMaxLight);
           padding: var(--ddd-spacing-4);
-          width: 600px;
+          width: 100%;
+          max-width: 600px;
         }
 
-        .controls-panel-1 {
+        .controls-panel {
           background: var(--ddd-theme-default-navy40);
           padding: var(--ddd-spacing-4);
-          width: 400px;
-        }
-
-        .controls-panel-2 {
-          background: var(--ddd-theme-default-navy40);
-          padding: var(--ddd-spacing-4);
-          width: 400px;
-          justify-content: center;
-        }
-
-        wired-item {
-          opacity: 1;
+          flex: 1;
+          min-width: 320px;
         }
 
         .input-group {
@@ -96,15 +89,10 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
 
         .seed-display {
           margin-top: var(--ddd-spacing-4);
-          margin-right: var(--ddd-spacing-4);
         }
 
         .share-button {
           margin-top: var(--ddd-spacing-4);
-        }
-
-        wired-checkbox {
-          margin: var(--ddd-spacing-2) 0;
         }
 
         @media (max-width: 768px) {
@@ -115,46 +103,13 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
 
           .character-panel {
             max-width: 100%;
-            padding: var(--ddd-spacing-2);
           }
 
           .controls-panel {
             width: 100%;
-            padding: var(--ddd-spacing-2);
-          }
-
-          wired-slider {
-            width: 100%;
-          }
-
-          wired-radio {
-            display: block;
-            margin-bottom: var(--ddd-spacing-2);
-          }
-
-          .input-group {
-            width: 100%;
-          }
-
-          .share-button {
-            width: 100%;
           }
         }
-
-        @media (min-width: 769px) {
-          .wrapper {
-            flex-direction: row;
-          }
-
-          .character-panel {
-            width: 600px;
-          }
-
-          .controls-panel {
-            width: 400px;
-          }
-        }
-      `
+      `,
     ];
   }
 
@@ -163,26 +118,14 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
     const seed = params.get('seed');
     if (seed && seed.length === 10) {
       this.seed = seed;
-      // Parse the seed into individual values and force numeric conversion
-      this.accessories = Number(seed[0]);
-      this.base = Number(seed[1]) === 5 ? 5 : 1;
-      this.face = Number(seed[2]);
-      this.faceItem = Number(seed[3]);
-      this.hair = Number(seed[4]);
-      this.pants = Number(seed[5]);
-      this.shirt = Number(seed[6]);
-      this.skin = Number(seed[7]);
-      this.hatColor = Number(seed[8]);
-      
-      // Force an update after setting all properties
-      this.requestUpdate();
+      this.parseSeed(seed);
     }
 
     // Load boolean values
     this.fire = params.get('fire') === 'true';
     this.walking = params.get('walking') === 'true';
     this.circle = params.get('circle') === 'true';
-    
+
     // Load hat value
     const hat = params.get('hat');
     if (hat && this.isValidHat(hat)) {
@@ -190,14 +133,28 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
     }
   }
 
+  parseSeed(seed) {
+    this.accessories = Number(seed[0]);
+    this.base = Number(seed[1]) === 5 ? 5 : 1;
+    this.face = Number(seed[2]);
+    this.faceItem = Number(seed[3]);
+    this.hair = Number(seed[4]);
+    this.pants = Number(seed[5]);
+    this.shirt = Number(seed[6]);
+    this.skin = Number(seed[7]);
+    this.hatColor = Number(seed[8]);
+    this.requestUpdate();
+  }
+
   isValidHat(hat) {
-    const validHats = ['none', 'bunny', 'coffee', 'construction', 'cowboy', 
-                      'education', 'knight', 'ninja', 'party', 'pirate', 'watermelon'];
+    const validHats = [
+      'none', 'bunny', 'coffee', 'construction', 'cowboy', 'education', 
+      'knight', 'ninja', 'party', 'pirate', 'watermelon',
+    ];
     return validHats.includes(hat);
   }
 
   updateSeed() {
-    // Create the seed string
     this.seed = `${this.accessories}${this.base}${this.face}${this.faceItem}${this.hair}${this.pants}${this.shirt}${this.skin}${this.hatColor}0`;
     this.updateUrl();
   }
@@ -205,9 +162,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   updateUrl() {
     const params = new URLSearchParams();
     params.set('seed', this.seed);
-    if (this.hat !== 'none') {
-      params.set('hat', this.hat);
-    }
+    if (this.hat !== 'none') params.set('hat', this.hat);
     if (this.fire) params.set('fire', 'true');
     if (this.walking) params.set('walking', 'true');
     if (this.circle) params.set('circle', 'true');
@@ -219,18 +174,14 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   handleInputChange(property, event) {
     if (event.target.tagName.toLowerCase() === 'wired-checkbox') {
       this[property] = event.target.checked;
-    } else if (property === 'base') {
-      const value = event.detail.selected;
-      this[property] = value === "5" ? 5 : 1;
-      this.requestUpdate();
-    } else if (property === 'hat') {
+    } else if (event.target.tagName.toLowerCase() === 'wired-combo') {
       this[property] = event.detail.selected;
     } else if (event.detail?.selected !== undefined) {
       this[property] = Number(event.detail.selected);
     } else {
       this[property] = Number(event.target.value);
     }
-    
+
     if (!['hat', 'fire', 'walking', 'circle'].includes(property)) {
       this.updateSeed();
     } else {
@@ -274,13 +225,13 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           </div>
         </div>
 
-        <div class="controls-panel-1">
+        <div class="controls-panel">
           <div class="input-group">
             <label for="base">Character Type</label>
             <wired-combo id="base" .value="${this.base}" @selected="${(e) => this.handleInputChange('base', e)}">
               <wired-item value="1">Male</wired-item>
               <wired-item value="5">Female</wired-item>
-            </wired-combo>    
+            </wired-combo>
           </div>
 
           <div class="input-group">
@@ -324,7 +275,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           </div>
         </div>
 
-        <div class="controls-panel-2">
+        <div class="controls-panel">
           <div class="input-group">
             <label for="hat">Hat Style</label>
             <wired-combo id="hat" .value="${this.hat}" @selected="${(e) => this.handleInputChange('hat', e)}">
